@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML转图片工具</title>
+</head>
+<body>
+    <h1>HTML转图片工具</h1>
+    <input type="file" id="htmlFileInput" accept=".html">
+    <div id="htmlContent" style="display:none; border: 1px solid black; padding: 10px; min-height: 100px;"></div>
+    <button id="convertButton" onclick="convertToImage()" disabled>转换成图片</button>
+    <div id="imageResult"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+    <script>
+        document.getElementById('htmlFileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    document.getElementById('htmlContent').innerHTML = content;
+                    document.getElementById('htmlContent').style.display = 'block';
+                    document.getElementById('convertButton').disabled = false;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function convertToImage() {
+            const element = document.getElementById('htmlContent');
+            html2canvas(element).then(canvas => {
+                const dataUrl = canvas.toDataURL('image/png');
+                const imgElement = document.createElement('img');
+                imgElement.src = dataUrl;
+                imgElement.style.maxWidth = '100%';
+                imgElement.style.maxHeight = '100%';
+                document.getElementById('imageResult').appendChild(imgElement);
+
+                // 创建下载链接
+                const downloadLink = document.createElement('a');
+                downloadLink.href = dataUrl;
+                downloadLink.download = 'screenshot.png';
+                downloadLink.textContent = '下载图片';
+                downloadLink.style.display = 'block';
+                document.getElementById('imageResult').appendChild(downloadLink);
+            });
+        }
+    </script>
+</body>
+</html>
